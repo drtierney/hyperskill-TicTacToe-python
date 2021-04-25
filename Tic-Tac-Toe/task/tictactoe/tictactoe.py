@@ -42,12 +42,11 @@ def check_game_state(board):
     win_states = [[board[0][0], board[0][1], board[0][2]],
                   [board[1][0], board[1][1], board[1][2]],
                   [board[2][0], board[2][1], board[2][2]],
-                  [board[0][0], board[1][0], board[1][0]],
+                  [board[0][0], board[1][0], board[2][0]],
                   [board[0][1], board[1][1], board[2][1]],
                   [board[0][2], board[1][2], board[2][2]],
                   [board[0][0], board[1][1], board[2][2]],
                   [board[0][2], board[1][1], board[2][0]]]
-    
     x_moves = sum(x.count("X") for x in board)
     o_moves = sum(o.count("O") for o in board)
 
@@ -56,27 +55,36 @@ def check_game_state(board):
     o_wins = len([c for c in win_states if c.count("O") == 3])
 
     if x_wins and o_wins or max(x_moves, o_moves) - min(x_moves, o_moves) >= 2:
-        print(game_states.get(4))
+        return 4
     elif not x_wins and not o_wins and is_full_board:
-        print(game_states.get(1))
+        return 1
     elif x_wins:
-        print(game_states.get(2))
+        return 2
     elif o_wins:
-        print(game_states.get(3))
+        return 3
     else:
-        print(game_states.get(0))
+        return 0
 
 
-initial_state = input("Enter cells: ").replace("_", " ")
+def change_player(symbol):
+    return "X" if symbol == "O" else "O"
 
-the_board = [[initial_state[0], initial_state[1], initial_state[2]],
-             [initial_state[3], initial_state[4], initial_state[5]],
-             [initial_state[6], initial_state[7], initial_state[8]]]
+
+the_board = [[' ' for _ in range(3)] for _ in range(3)]
 
 print_board(the_board)
+current_state = 0
 can_make_move = False
+current_player = "X"
 
-while not can_make_move:
-    user_move = input("Enter the coordinates: ")
-    can_make_move = make_move(user_move, the_board, "X")
-print_board(the_board)
+while True:
+    if current_state:
+        break
+    while not can_make_move:
+        user_move = input("Enter the coordinates: ")
+        can_make_move = make_move(user_move, the_board, current_player)
+    print_board(the_board)
+    current_state = check_game_state(the_board)
+    current_player = change_player(current_player)
+    can_make_move = False
+print(game_states.get(current_state))
